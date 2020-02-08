@@ -127,7 +127,7 @@ namespace Parse
                 /// An instance of <see cref="VersionInformation"/> with inferred values based on the entry assembly.
                 /// </summary>
                 /// <remarks>Should not be used with Unity.</remarks>
-                public static VersionInformation Inferred { get; } = new VersionInformation { BuildVersion = Assembly.GetEntryAssembly().GetName().Version.Build.ToString(), DisplayVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(), OSVersion = Environment.OSVersion.ToString() };
+                public static VersionInformation Inferred { get { return new VersionInformation { BuildVersion = Assembly.GetEntryAssembly().GetName().Version.Build.ToString(), DisplayVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(), OSVersion = Environment.OSVersion.ToString() }; }}
 
                 /// <summary>
                 /// The build number of your app.
@@ -148,11 +148,6 @@ namespace Parse
                 /// Gets a value for whether or not this instance of <see cref="VersionInformation"/> is populated with default values.
                 /// </summary>
                 internal bool IsDefault => BuildVersion is null && DisplayVersion is null && OSVersion is null;
-
-                /// <summary>
-                /// Gets a value for whether or not this instance of <see cref="VersionInformation"/> can currently be used for the generation of <see cref="MetadataBasedStorageConfiguration.NoCompanyInferred"/>.
-                /// </summary>
-                internal bool CanBeUsedForInference => !(IsDefault || String.IsNullOrWhiteSpace(DisplayVersion));
             }
 
             /// <summary>
@@ -239,10 +234,7 @@ namespace Parse
 
                 switch (configuration.VersionInfo)
                 {
-                    case Configuration.VersionInformation info when info.CanBeUsedForInference:
-                        break;
                     case Configuration.VersionInformation info when !info.IsDefault:
-                        configuration.VersionInfo = new Configuration.VersionInformation { BuildVersion = info.BuildVersion, OSVersion = info.OSVersion, DisplayVersion = Configuration.VersionInformation.Inferred.DisplayVersion };
                         break;
                     default:
                         configuration.VersionInfo = Configuration.VersionInformation.Inferred;
